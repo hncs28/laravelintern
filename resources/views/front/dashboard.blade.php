@@ -101,7 +101,7 @@
             margin-left: 270px;
             padding: 30px;
             display: grid;
-            grid-template-columns: repeat(3, 1fr); 
+            grid-template-columns: repeat(3, 1fr);
             gap: 20px;
             margin-top: 90px;
         }
@@ -114,8 +114,8 @@
             text-align: center;
             padding: 15px;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
-            width: 300px; 
-            height: auto; 
+            width: 300px;
+            height: auto;
         }
 
         .course-card:hover {
@@ -299,7 +299,7 @@
         $("#logoutBtn").click(function() {
             logout();
         });
-       
+
     });
 
     function logout() {
@@ -339,6 +339,7 @@
                             </div>
                             <h3>${course.courseName}</h3>
                             <p>${new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(course.coursePrice)}</p>
+                            <p>Lecture Name: ${course.lectureName}</p>
                             <button class="RegisCourse" id="RegisCourse" data-id="${course.id}">Add to cart</button>
                         </div>
                         `;
@@ -506,7 +507,7 @@
                                 `;
                         $cartItemsContainer.append(itemHtml);
                     });
-                    
+
                 }
             },
             error: function(xhr, status, error) {
@@ -519,8 +520,8 @@
                 url: `${baseurl}/save-cart`,
                 method: 'POST',
                 headers: {
-                'Authorization': 'Bearer ' + localStorage.getItem('Token')
-            },
+                    'Authorization': 'Bearer ' + localStorage.getItem('Token')
+                },
                 success: function(response) {
                     alert(response.message);
                     $('#cartModal').css('display', 'none');
@@ -531,7 +532,7 @@
                     console.error('Error:', xhr.status, xhr.responseText);
                 }
             })
-    });
+        });
     });
 
     $('.close-btn').on('click', function() {
@@ -543,86 +544,87 @@
             $('#cartModal').css('display', 'none');
         }
     });
-    $('#cart-items').on('click','.remove-btn',function(){
+    $('#cart-items').on('click', '.remove-btn', function() {
         const courseId = $(this).data('id');
         const $item = $(this).closest('.cart-item');
         $.ajax({
-            url:`${baseurl}/clear-cart/`+courseId,
-            method:'DELETE',
+            url: `${baseurl}/clear-cart/` + courseId,
+            method: 'DELETE',
             headers: {
                 'Authorization': 'Bearer ' + localStorage.getItem('Token')
             },
-            success: function (response) {
-                        alert(response.message);
-                        $item.remove(); 
-                        if ($('#cart-items').children().length === 0) {
-                            $('#cart-items').html('<p class="empty-cart">Your cart is empty.</p>');
-                        }
-                    },
-                    error: function (xhr) {
-                        const errorMsg = xhr.responseJSON?.message || 'Error removing from cart';
-                        alert(errorMsg);
-                        console.log('Error:', xhr.status, xhr.responseText);
-                    }
+            success: function(response) {
+                alert(response.message);
+                $item.remove();
+                if ($('#cart-items').children().length === 0) {
+                    $('#cart-items').html('<p class="empty-cart">Your cart is empty.</p>');
+                }
+            },
+            error: function(xhr) {
+                const errorMsg = xhr.responseJSON?.message || 'Error removing from cart';
+                alert(errorMsg);
+                console.log('Error:', xhr.status, xhr.responseText);
+            }
         });
     });
     $('#mycourses').on('click', function() {
-    $('#courseModal').css('display', 'flex');
+        $('#courseModal').css('display', 'flex');
 
-    $.ajax({
-        url: `${baseurl}/api/get/courses`,
-        method: 'GET',
-        headers: {
-            'Authorization': 'Bearer ' + localStorage.getItem('Token')
-        },
-        xhrFields: {
-            withCredentials: true
-        },
-        success: function(response) {
-            const $courseItemsContainer = $('#course-items');
-            $courseItemsContainer.empty();
+        $.ajax({
+            url: `${baseurl}/api/get/courses`,
+            method: 'GET',
+            headers: {
+                'Authorization': 'Bearer ' + localStorage.getItem('Token')
+            },
+            xhrFields: {
+                withCredentials: true
+            },
+            success: function(response) {
+                const $courseItemsContainer = $('#course-items');
+                $courseItemsContainer.empty();
 
-            // Check if response and response.courses exist and is an array
-            if (!response || !response.courses || !Array.isArray(response.courses)) {
-                $courseItemsContainer.html('<p class="empty-cart">No courses available.</p>');
-                console.error('Invalid response data:', response);
-                return;
-            }
 
-            const courseItems = response.courses; // Changed from response.data to response.courses
-            courseItems.forEach(function(item) {
-                const courseHtml = `
+                if (!response || !response.courses || !Array.isArray(response.courses)) {
+                    $courseItemsContainer.html('<p class="empty-cart">No courses available.</p>');
+                    console.error('Invalid response data:', response);
+                    return;
+                }
+
+                const courseItems = response.courses;
+                courseItems.forEach(function(item) {
+                    const courseHtml = `
                     <div class="course-items">
                         <h3>${escapeHtml(item.courseName)}</h3>
                         <p>Course ID: ${escapeHtml(String(item.courseID))}</p>
                         <p>${new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.coursePrice)}</p>
                     </div>
                 `;
-                $courseItemsContainer.append(courseHtml);
-            });
-        },
-        error: function(xhr, status, error) {
-            $('#course-items').html('<p class="empty-cart">Error loading courses.</p>');
-            console.error('Error:', status, error);
+                    $courseItemsContainer.append(courseHtml);
+                });
+            },
+            error: function(xhr, status, error) {
+                $('#course-items').html('<p class="empty-cart">Error loading courses.</p>');
+                console.error('Error:', status, error);
+            }
+        });
+    });
+
+    $('.close-btn').on('click', function() {
+        $('#courseModal').css('display', 'none');
+    });
+
+    $(window).on('click', function(event) {
+        if (event.target === $('#courseModal')[0]) {
+            $('#courseModal').css('display', 'none');
         }
     });
-});
 
-$('.close-btn').on('click', function() {
-    $('#courseModal').css('display', 'none');
-});
-
-$(window).on('click', function(event) {
-    if (event.target === $('#courseModal')[0]) {
-        $('#courseModal').css('display', 'none');
+    function escapeHtml(unsafe) {
+        return unsafe
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
     }
-});
-function escapeHtml(unsafe) {
-    return unsafe
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-}
 </script>

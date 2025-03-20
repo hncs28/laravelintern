@@ -27,7 +27,18 @@ class Course extends Model
     }
     public static function getAllCourses()
     {
-        return self::all(); 
+        return self::with('lecture')
+            ->get()
+            ->map(function ($course) {
+                return [
+                    'courseID' => $course->id,
+                    'courseName' => $course->courseName,
+                    'img'=>$course->img,
+                    'coursePrice' => $course->coursePrice,
+                    'lectureName' => $course->lecture->lectureName ?? 'N/A',
+                    'added_at' => $course->created_at,
+                ];
+            });
     }
     public static function getByCategory($categoryId)
     {
