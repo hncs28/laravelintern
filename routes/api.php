@@ -9,6 +9,7 @@ use App\Jobs\CacheLectureCount;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\LectureController;
+use App\Http\Controllers\UserController;
 Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:api');
@@ -23,5 +24,6 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/courses/category/{id}', [CourseController::class, 'getCoursesByCategory']);
     Route::get('/get/category', [CategoryController::class, 'getAll']);
     Route::get('/get/courses',[CourseController::class,'getUserandCourses']);
+    Route::get('/user/detail', [UserController::class, 'getdetail']);
 });
 
