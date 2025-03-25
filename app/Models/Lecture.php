@@ -13,4 +13,8 @@ class Lecture extends Model
         'lectureName',
         'lecturePhone',
     ];
+    public static function getLectures()
+    {
+        return Lecture::all();
+    }
 }

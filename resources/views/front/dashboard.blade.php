@@ -13,7 +13,6 @@
             background-color: #f4f4f9;
         }
 
-
         .top-menu {
             background-color: #222;
             color: white;
@@ -36,8 +35,8 @@
             font-size: 16px;
         }
 
-        .top-menu .logoutBtn {
-            background-color: red;
+        .top-menu button {
+            background-color: #007bff;
             color: white;
             border: none;
             padding: 8px 15px;
@@ -46,16 +45,22 @@
             font-size: 14px;
         }
 
+        .top-menu button:hover {
+            background-color: #0056b3;
+        }
+
+        .top-menu .logoutBtn {
+            background-color: red;
+        }
+
         .top-menu .logoutBtn:hover {
             background-color: darkred;
         }
-
 
         .container {
             display: flex;
             margin-top: 60px;
         }
-
 
         .vertical-menu {
             width: 250px;
@@ -114,7 +119,7 @@
             text-align: center;
             padding: 15px;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
-            width: 300px;
+            width: 400px;
             height: auto;
         }
 
@@ -223,14 +228,45 @@
         }
 
         .cart-item {
-            border-bottom: 1px solid #ddd;
-            padding: 10px 0;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 10px 0;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .cart-item h3 {
+            margin: 0 0 10px;
+            font-size: 20px;
+            color: #333;
+        }
+
+        .cart-item p {
+            margin: 5px 0;
+            font-size: 16px;
+            color: #555;
+        }
+
+        .cart-item .remove-btn {
+            background-color: red;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        .cart-item .remove-btn:hover {
+            background-color: darkred;
         }
 
         .empty-cart {
             text-align: center;
             color: #888;
         }
+
 
         button {
             padding: 10px 20px;
@@ -244,19 +280,61 @@
         button:hover {
             background-color: #0056b3;
         }
+
+        .user-items {
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 10px 0;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .user-items h3 {
+            margin: 0 0 10px;
+            font-size: 20px;
+            color: #333;
+        }
+
+        .user-items p {
+            margin: 5px 0;
+            font-size: 16px;
+            color: #555;
+        }
+
+        .course-items {
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 10px 0;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .course-items h3 {
+            margin: 0 0 10px;
+            font-size: 20px;
+            color: #333;
+        }
+
+        .course-items p {
+            margin: 5px 0;
+            font-size: 16px;
+            color: #555;
+        }
     </style>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 
 <body>
-
-    <div class="top-menu">
-        <a href="#">My Account</a>
-        <a><button id="mycourses">My Courses</button></a>
-        <a><button id="showCartBtn">Show Cart</button></a>
-        <a><button id="logoutBtn" class="logoutBtn">Logout</button></a>
-    </div>
-
+    <header>
+        <div class="top-menu">
+            <a><button id="myaccount">My Account</button></a>
+            <a><button id="mycourses">My Courses</button></a>
+            <a><button id="showCartBtn">Show Cart</button></a>
+            <a><button id="logoutBtn" class="logoutBtn">Logout</button></a>
+        </div>
+    </header>
 
     <div class="vertical-menu">
         <ul id="category-list">
@@ -268,7 +346,7 @@
     </div>
     <div id="course-count" style="text-align:center; margin-top:20px; font-weight:bold;"></div>
     <div id="lecture-count" style="text-align:center; margin-top:20px; font-weight:bold;">
-        Total lectures: {{ Cache::get('lectures_count', 'N/A') }}
+        Total lectures: {{ Cache::get('total_lectures', 'N/A') }}
     </div>
     <div id="cartModal" class="modal">
         <div class="modal-content">
@@ -283,6 +361,13 @@
             <span class="close-btn">×</span>
             <h2>Your Courses</h2>
             <div id="course-items"></div>
+        </div>
+    </div>
+    <div id="userModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn">×</span>
+            <h2>Your Account</h2>
+            <div id="user-items"></div>
         </div>
     </div>
 </body>
@@ -340,11 +425,10 @@
                             <h3>${course.courseName}</h3>
                             <p>${new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(course.coursePrice)}</p>
                             <p>Lecture Name: ${course.lectureName}</p>
-                            <button class="RegisCourse" id="RegisCourse" data-id="${course.id}">Add to cart</button>
+                            <button class="RegisCourse" id="RegisCourse" data-id="${course.courseID}">Add to cart</button>
                         </div>
                         `;
                     });
-
                     $(".course-container").html(courseHTML);
                     $(document).on('click', '.RegisCourse', function() {
                         const $courseId = $(this).data('id');
@@ -616,6 +700,65 @@
     $(window).on('click', function(event) {
         if (event.target === $('#courseModal')[0]) {
             $('#courseModal').css('display', 'none');
+        }
+    });
+
+    function escapeHtml(unsafe) {
+        return unsafe
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+
+    $('#myaccount').on('click', function() {
+        $('#userModal').css('display', 'flex');
+
+        $.ajax({
+            url: `${baseurl}/api/user/detail`,
+            method: 'GET',
+            headers: {
+                'Authorization': 'Bearer ' + localStorage.getItem('Token')
+            },
+            xhrFields: {
+                withCredentials: true
+            },
+            success: function(response) {
+                const $userItemscontainer = $('#user-items');
+                $userItemscontainer.empty();
+
+                if (!response || !response.id) {
+                    $userItemscontainer.html(
+                        '<p class="empty-cart">No user details available.</p>');
+                    console.error('Invalid response data:', response);
+                    return;
+                }
+
+                const userHtml = `
+                    <div class="user-items">
+                        <h3>${escapeHtml(response.name)}</h3>
+                        <p>Email: ${escapeHtml(response.email)}</p>
+                        <p>Date of Birth: ${escapeHtml(response.dob)}</p>
+                        <p>Type of Vehicle: ${escapeHtml(response.typeofvehicle)}</p>
+                    </div>
+                `;
+                $userItemscontainer.append(userHtml);
+            },
+            error: function(xhr, status, error) {
+                $('#user-items').html('<p class="empty-cart">Error loading user details.</p>');
+                console.error('Error:', status, error);
+            }
+        });
+    });
+
+    $('.close-btn').on('click', function() {
+        $('#userModal').css('display', 'none');
+    });
+
+    $(window).on('click', function(event) {
+        if (event.target === $('#userModal')[0]) {
+            $('#userModal').css('display', 'none');
         }
     });
 
